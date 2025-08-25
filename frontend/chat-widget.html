@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planet Eco Services Chat Widget</title>
+    <link rel="stylesheet" href="chat-widget.css">
+</head>
+<body>
+    <!-- Chat Widget Container -->
+    <div id="eco-chat-widget" class="eco-chat-widget">
+        <!-- Chat Button -->
+        <button id="eco-chat-button" class="eco-chat-button">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/>
+            </svg>
+            <span class="eco-chat-badge" style="display: none;">1</span>
+        </button>
+
+        <!-- Chat Window -->
+        <div id="eco-chat-window" class="eco-chat-window" style="display: none;">
+            <!-- Header -->
+            <div class="eco-chat-header">
+                <div class="eco-header-info">
+                    <img src="https://www.planetecoservices.co.uk/logo.png" alt="Planet Eco" class="eco-logo">
+                    <div>
+                        <h3>Planet Eco Services</h3>
+                        <span class="eco-status">🟢 Online</span>
+                    </div>
+                </div>
+                <button id="eco-close-chat" class="eco-close-btn">×</button>
+            </div>
+
+            <!-- Messages Area -->
+            <div id="eco-messages" class="eco-messages">
+                <div class="eco-message eco-bot-message">
+                    <div class="eco-message-content">
+                        👋 Hello! I'm your Planet Eco Services assistant. I can help you with:
+                        <ul>
+                            <li>Free heating grants information</li>
+                            <li>Solar panel installations</li>
+                            <li>Insulation services</li>
+                            <li>Booking a free home survey</li>
+                        </ul>
+                        How can I help you today?
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="eco-quick-actions">
+                <button class="eco-quick-btn" data-action="grants">Free Grants Info</button>
+                <button class="eco-quick-btn" data-action="survey">Book Survey</button>
+                <button class="eco-quick-btn" data-action="services">Our Services</button>
+            </div>
+
+            <!-- Input Area -->
+            <div class="eco-input-area">
+                <input type="text" id="eco-message-input" placeholder="Type your message..." />
+                <button id="eco-send-btn" class="eco-send-btn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Booking Form Modal -->
+    <div id="eco-booking-modal" class="eco-modal" style="display: none;">
+        <div class="eco-modal-content">
+            <span class="eco-modal-close">&times;</span>
+            <h2>Book Your Free Home Survey</h2>
+            <form id="eco-booking-form">
+                <input type="text" name="name" placeholder="Your Name" required>
+                <input type="email" name="email" placeholder="Email Address" required>
+                <input type="tel" name="phone" placeholder="Phone Number" required>
+                <input type="text" name="postcode" placeholder="Postcode" required>
+                <select name="service" required>
+                    <option value="">Select Service Interest</option>
+                    <option value="heating">Central Heating Grant</option>
+                    <option value="solar">Solar Panels</option>
+                    <option value="insulation">Insulation</option>
+                    <option value="heat-pump">Air Source Heat Pump</option>
+                    <option value="all">All Services</option>
+                </select>
+                <textarea name="message" placeholder="Additional Information (Optional)"></textarea>
+                <button type="submit" class="eco-submit-btn">Submit Booking Request</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="chat-widget.js"></script>
+</body>
+</html>

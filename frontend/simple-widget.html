@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>极简AI聊天插件 - 无需后端</title>
+    <style>
+        /* 💬 聊天按钮 */
+        .chat-bubble {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* 💬 聊天窗口 */
+        .chat-window {
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            width: 350px;
+            height: 500px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            display: none;
+            flex-direction: column;
+            z-index: 9998;
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 15px 15px 0 0;
+            font-weight: bold;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+        }
+
+        .message {
+            margin: 10px 0;
+            padding: 10px 15px;
+            border-radius: 10px;
+            max-width: 80%;
+        }
+
+        .user-message {
+            background: #f0f0f0;
+            margin-left: auto;
+            text-align: right;
+        }
+
+        .bot-message {
+            background: #e8f0fe;
+            margin-right: auto;
+        }
+
+        .chat-input {
+            display: flex;
+            padding: 15px;
+            border-top: 1px solid #eee;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            outline: none;
+        }
+
+        .send-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin-left: 10px;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+
+        /* 快速回复按钮 */
+        .quick-replies {
+            padding: 10px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .quick-btn {
+            background: white;
+            border: 1px solid #667eea;
+            color: #667eea;
+            padding: 5px 15px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .quick-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- 聊天气泡按钮 -->
+    <div class="chat-bubble" onclick="toggleChat()">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="white">
+            <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/>
+        </svg>
+    </div>
+
+    <!-- 聊天窗口 -->
+    <div class="chat-window" id="chatWindow">
+        <div class="chat-header">
+            🌍 Planet Eco Services AI助手
+        </div>
+        
+        <div class="chat-messages" id="chatMessages">
+            <div class="message bot-message">
+                👋 您好！我是Planet Eco Services的AI助手。我可以帮您了解：
+                <br>• 免费供暖补助
+                <br>• 太阳能板安装
+                <br>• 房屋保温服务
+                <br>• 预约免费家庭能源评估
+            </div>
+        </div>
+
+        <div class="quick-replies">
+            <button class="quick-btn" onclick="quickReply('了解免费供暖补助')">免费供暖补助</button>
+            <button class="quick-btn" onclick="quickReply('预约家庭评估')">预约评估</button>
+            <button class="quick-btn" onclick="quickReply('太阳能板价格')">太阳能板</button>
+            <button class="quick-btn" onclick="quickReply('联系方式')">联系我们</button>
+        </div>
+
+        <div class="chat-input">
+            <input type="text" id="messageInput" placeholder="输入您的问题..." onkeypress="handleKeyPress(event)">
+            <button class="send-btn" onclick="sendMessage()">发送</button>
+        </div>
+    </div>
+
+    <script>
+        // 🎯 预设的问答库（无需后端）
+        const knowledgeBase = {
+            "供暖|补助|grants|heating": {
+                response: "我们提供ECO4政府补助计划，符合条件的家庭可以获得免费的中央供暖系统升级。申请条件包括：\n• 领取特定福利\n• 家庭收入低于£31,000\n• 房屋EPC评级为D-G\n\n您想预约免费评估吗？",
+                followUp: true
+            },
+            "太阳能|solar|panel": {
+                response: "太阳能板安装可以帮您：\n• 减少电费高达70%\n• 获得政府补贴\n• 25年质保\n• 增加房产价值\n\n符合条件的家庭可申请免费安装。需要我帮您预约评估吗？",
+                followUp: true
+            },
+            "保温|insulation": {
+                response: "我们提供多种保温服务：\n• 阁楼保温\n• 内墙保温\n• 空心墙保温\n• 屋顶房间保温\n\n保温可减少高达35%的热量流失。想了解您家适合哪种方案吗？",
+                followUp: true
+            },
+            "预约|评估|survey|book": {
+                response: "预约免费家庭能源评估非常简单！\n\n请提供以下信息：\n• 您的姓名\n• 联系电话\n• 邮政编码\n• 方便的时间\n\n或直接致电：07765556558",
+                followUp: false
+            },
+            "联系|电话|email|contact": {
+                response: "📞 电话：07765556558\n📧 邮箱：info@planetecoservices.co.uk\n📍 地址：Units 2 & 2A Hendham Vale Industrial Park, Manchester M8 0AD\n\n工作时间：周一至周五 9:00-18:00",
+                followUp: false
+            }
+        };
+
+        // 🤖 简单的AI响应函数
+        function getAIResponse(message) {
+            const lowerMessage = message.toLowerCase();
+            
+            // 遍历知识库寻找匹配
+            for (const [keywords, data] of Object.entries(knowledgeBase)) {
+                const keywordList = keywords.split('|');
+                if (keywordList.some(keyword => lowerMessage.includes(keyword))) {
+                    return data.response;
+                }
+            }
+            
+            // 默认响应
+            return "感谢您的询问！我可以帮您了解：\n• 免费供暖补助\n• 太阳能板安装\n• 房屋保温服务\n• ECO4补助计划\n\n请问您对哪个服务感兴趣？或者您可以直接致电 07765556558 与我们的专家交谈。";
+        }
+
+        // 💬 聊天功能
+        function toggleChat() {
+            const chatWindow = document.getElementById('chatWindow');
+            chatWindow.style.display = chatWindow.style.display === 'none' ? 'flex' : 'none';
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            // 添加用户消息
+            addMessage(message, 'user');
+            
+            // 清空输入框
+            input.value = '';
+            
+            // 模拟打字效果
+            setTimeout(() => {
+                const response = getAIResponse(message);
+                addMessage(response, 'bot');
+                
+                // 如果包含预约关键词，收集用户信息
+                if (message.includes('预约') || message.includes('book')) {
+                    collectUserInfo();
+                }
+            }, 500);
+        }
+
+        function addMessage(text, sender) {
+            const messagesDiv = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}-message`;
+            messageDiv.innerHTML = text.replace(/\n/g, '<br>');
+            messagesDiv.appendChild(messageDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        function quickReply(text) {
+            document.getElementById('messageInput').value = text;
+            sendMessage();
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        // 📝 收集用户信息（存储到localStorage）
+        function collectUserInfo() {
+            setTimeout(() => {
+                const userInfo = {
+                    timestamp: new Date().toISOString(),
+                    messages: Array.from(document.querySelectorAll('.user-message')).map(m => m.textContent)
+                };
+                
+                // 保存到本地存储
+                const leads = JSON.parse(localStorage.getItem('ecoLeads') || '[]');
+                leads.push(userInfo);
+                localStorage.setItem('ecoLeads', JSON.stringify(leads));
+                
+                console.log('用户信息已保存:', userInfo);
+            }, 1000);
+        }
+
+        // 🎨 可选：使用Web Speech API实现语音输入
+        if ('webkitSpeechRecognition' in window) {
+            // 可以添加语音识别功能
+        }
+    </script>
+</body>
+</html>

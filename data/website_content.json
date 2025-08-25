@@ -1,0 +1,41 @@
+{
+  "company": {
+    "name": "Planet Eco Services",
+    "mission": "To positively impact the environment and provide convenience to people",
+    "contact": {
+      "phone": "07765556558",
+      "email": "info@planetecoservices.co.uk",
+      "address": "Units 2 & 2A Hendham Vale Industrial Park, Vale Park Way, Crumpsall, Manchester M8 0AD"
+    }
+  },
+  "services": [
+    {
+      "name": "Free Central Heating Grants",
+      "description": "Get free central heating system upgrades through government grants"
+    },
+    {
+      "name": "Air Source Heat Pumps",
+      "description": "Energy-efficient heating solution using air source technology"
+    },
+    {
+      "name": "Solar Panel Grants",
+      "description": "Free solar panel installation for eligible households"
+    },
+    {
+      "name": "Internal Wall Insulation",
+      "description": "Improve home energy efficiency with internal wall insulation"
+    },
+    {
+      "name": "Loft Insulation",
+      "description": "Reduce heat loss and energy bills with loft insulation"
+    },
+    {
+      "name": "Room in Roof Insulation",
+      "description": "Specialized insulation for converted loft spaces"
+    }
+  ],
+  "eco4_scheme": {
+    "description": "Government funding scheme for energy efficiency improvements",
+    "eligibility": "Available for qualifying households to reduce energy bills"
+  }
+}
